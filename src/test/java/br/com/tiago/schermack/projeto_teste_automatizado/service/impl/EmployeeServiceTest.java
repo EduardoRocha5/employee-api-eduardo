@@ -10,6 +10,7 @@ import br.com.tiago.schermack.projeto_teste_automatizado.dto.EmployeeRequestDTO;
 import br.com.tiago.schermack.projeto_teste_automatizado.dto.EmployeeResponseDTO;
 import br.com.tiago.schermack.projeto_teste_automatizado.entity.Employee;
 import br.com.tiago.schermack.projeto_teste_automatizado.repository.EmployeeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,15 +78,34 @@ class EmployeeServiceTest {
         // arrange
         EmployeeRequestDTO requestDTO = new EmployeeRequestDTO("Eduardo", "eduardo@email.com");
 
-        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(employeeRepository.findById(1L))
+                .thenReturn(Optional.empty());
 
         // act
-        EmployeeResponseDTO responseDTO = employeeService.update(1L, requestDTO);
+        assertThrows(EntityNotFoundException.class,
+                () -> employeeService.update(1L, requestDTO));
+
+        // assert
+        verify(employeeRepository).findById(1L);
+    }
+
+    @Test
+    public void deveExcluirOFuncionarioQuandoTiverID() {
+
+        // arrange
+        Employee employee = new Employee("Eduardo", "eduardo@email.com");
+        employee.setId(1L);
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        // act
+
+        employeeService.delete(1L);
 
         // asserts
-        assertEquals(1L, responseDTO.id());
-        assertEquals("Eduardo", responseDTO.firstName());
-        assertEquals("eduardo@email.com", responseDTO.email());
+
+        verify(employeeRepository).findById(1L);
+        verify(employeeRepository).delete(employee);
 
     }
 
