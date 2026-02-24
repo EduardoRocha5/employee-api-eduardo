@@ -1,7 +1,8 @@
 package br.com.tiago.schermack.projeto_teste_automatizado.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,23 @@ public class EmployeeServiceIntegration {
         assertEquals(1L, responseDTO.id());
         assertEquals("Bendito", responseDTO.firstName());
         assertEquals("eduardo@email.com", responseDTO.email());
+
+    }
+
+    @Test
+    public void deveDeletarFuncionario() {
+
+        // arrange
+        Employee employee = new Employee("Eduardo", "eduardo@email.com");
+        Employee employeeResults = employeeRepository.save(employee);
+
+        employeeRepository.findById(employee.getId());
+
+        // act
+        employeeRepository.delete(employee);
+
+        // asserts
+        assertFalse(employeeRepository.existsById(employeeResults.getId()));
 
     }
 
